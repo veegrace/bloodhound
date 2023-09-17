@@ -1,6 +1,7 @@
-# bloodhound
-Packet Sniffer
+# BloodHound: Packet Sniffer
+## Cybersecurity Tool Project
+Author: [Verlin Grace Cabalhug](@veegrace)
 
-**TODO:**
-Cybersecurity Tool Project
-reference: https://github.com/pyinx/zk-sniffer/blob/master/main.go
+### References: 
+    * https://github.com/pyinx/zk-sniffer/blob/master/main.go
+    * https://github.com/blackhat-go/bhg/tree/master/ch-8
