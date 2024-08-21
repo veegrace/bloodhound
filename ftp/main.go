@@ -1,6 +1,9 @@
+// Still needs an active FTP server to draw a connection.
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"log"
 	"strings"
 
@@ -13,7 +16,7 @@ var (
 	snaplen  = int32(1600)
 	promisc  = false
 	timeout  = pcap.BlockForever
-	filter   = "tcp and port 80"
+	filter   = "tcp and dst port 21"
 	devFound = false
 )
 
@@ -24,8 +27,7 @@ func main() {
 	}
 
 	for _, device := range devices {
-		// Check if the device exists.
-		if strings.Contains(device.Name, iface) {
+		if strings.Contains(device.Name, iface) { // Check if the device exists.
 			devFound = true
 		}
 	}
@@ -39,13 +41,23 @@ func main() {
 	}
 	defer handle.Close()
 
+	fmt.Printf("Filters Set:'%s'\n", filter)
 	if err := handle.SetBPFFilter(filter); err != nil {
 		log.Panicln(err)
 	}
 
 	source := gopacket.NewPacketSource(handle, handle.LinkType())
+	fmt.Printf("Sources: %v\n", source)
 	for packet := range source.Packets() {
-		packet := packet
-		log.Printf("[PUP]: %v", packet.String())
+		appLayer := packet.ApplicationLayer()
+		if appLayer == nil {
+			continue
+		}
+		payload := appLayer.Payload()
+		if bytes.Contains(payload, []byte("USER")) {
+			fmt.Print(string(payload))
+		} else if bytes.Contains(payload, []byte("PASS")) {
+			fmt.Print(string(payload))
+		}
 	}
 }
